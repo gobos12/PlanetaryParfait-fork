@@ -17,7 +17,7 @@ namespace Multiuser
         public NetworkVariable<FixedString128Bytes> username = new NetworkVariable<FixedString128Bytes>(default,
             NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner); // read perm, write perm
 
-        [SerializeField] private GameObject _localMesh;
+        [SerializeField] private GameObject localMesh;
         [SerializeField] private TMP_Text usernameText;
 
         /// <summary>
@@ -27,8 +27,8 @@ namespace Multiuser
         public override void OnNetworkSpawn()
         {
             // find local player and change the text to the name
-            _localMesh = GameObject.FindGameObjectWithTag("Player");
-            if (IsLocalPlayer) username.Value = _localMesh.GetComponentInChildren<TMP_Text>().text; // updates username NetworkVariable to player's name
+            localMesh = GameObject.FindGameObjectWithTag("Player");
+            if (IsLocalPlayer) username.Value = localMesh.GetComponentInChildren<TMP_Text>().text; // updates username NetworkVariable to player's name
             usernameText.text = username.Value.ToString();
 
             // subscribes all connected clients to OnValueChanged(), which makes sure that when this variable updates, it is updated correctly across the network

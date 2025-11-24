@@ -34,7 +34,7 @@ public class MeshSetup : NetworkBehaviour
     {
         base.OnNetworkSpawn();
         
-        //delegate that checks when isVRMode is set
+        // delegate that checks when isVRMode is set
         isVRMode.OnValueChanged += OnVRModeChanged;
 
         if(IsLocalPlayer)
@@ -72,7 +72,7 @@ public class MeshSetup : NetworkBehaviour
     /// <summary>
     /// Updates player's mesh on all clients
     /// </summary>
-    public void ToggleOtherMeshes()
+    void ToggleOtherMeshes()
     {
         // if NOT local player, turn off corresponding 
         if (!IsLocalPlayer)
@@ -82,11 +82,13 @@ public class MeshSetup : NetworkBehaviour
             {
                 // turn off desktop mesh
                 desktopMesh.SetActive(false);
+                Debug.Log("turning off desktop mesh");
             }
             else if(isVRMode.Value == 2)
             {
                 // turn off vr mesh
                 xrMesh.SetActive(false);
+                Debug.Log("turning off vr mesh");
             }
             else
             {

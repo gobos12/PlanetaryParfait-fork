@@ -75,7 +75,7 @@ namespace UserInterface
                 // If player is in a multiuser room, top button is the "Leave Multiuser" button. Kicks player from multiuser room
                 if (GameState.InMultiuser)
                 {
-                    NetworkManager.Singleton.Shutdown();
+                    MultiplayerManager.Instance.LeaveRelay();
                     GameState.InMultiuser = false;
                     ToggleMenu(false);
                     
