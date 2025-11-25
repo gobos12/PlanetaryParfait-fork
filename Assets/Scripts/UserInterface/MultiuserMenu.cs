@@ -41,6 +41,7 @@ namespace UserInterface
         public TMP_Text errorText;
         public Button errorButton;
         
+        [Header("Audio Cues")] public AudioSource buttonClick;
         [HideInInspector] public bool canTab = false, canEnter = false, isHosting = false;
 
         void Awake()
@@ -72,6 +73,7 @@ namespace UserInterface
         {
             topButton.onClick.AddListener(delegate
             {
+                buttonClick.Play();
                 // If player is in a multiuser room, top button is the "Leave Multiuser" button. Kicks player from multiuser room
                 if (GameState.InMultiuser)
                 {
@@ -98,6 +100,7 @@ namespace UserInterface
             
             bottomButton.onClick.AddListener(delegate
             {
+                buttonClick.Play();
                 JoinRoom();
                 buttonMenu.SetActive(false);
                 inputMenu.SetActive(true);
@@ -106,6 +109,7 @@ namespace UserInterface
             //Error Menu Message
             errorButton.onClick.AddListener(delegate
             {
+                buttonClick.Play();
                 errorMenu.SetActive(false);
                 parentObject = buttonMenu;
                 CreateJoinRoom(); //resets menu to create/join room
@@ -146,6 +150,7 @@ namespace UserInterface
             //Back button listener
             backButtonMenu.onClick.AddListener(delegate
             {
+                buttonClick.Play();
                 ToggleMenu(false); 
                 if (GameState.InTerrain) MainMenu.OpenPrimaryMenus(false);
                 else MainMenu.OpenMenu(true);
@@ -155,6 +160,7 @@ namespace UserInterface
             //Input Menu Listeners
             backInputMenu.onClick.AddListener(delegate
             {
+                buttonClick.Play();
                 inputMenu.SetActive(false);
                 buttonMenu.SetActive(true);
                 parentObject = buttonMenu;

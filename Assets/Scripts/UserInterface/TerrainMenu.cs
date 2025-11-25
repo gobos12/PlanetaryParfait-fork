@@ -31,6 +31,8 @@ namespace UserInterface
         public Button backToGameButton;
         public Button logoutButton;
         
+        [Header("Audio Cues")] public AudioSource buttonClick;
+        
         void Awake()
         {
             OpenMenu = ToggleMenu;
@@ -52,6 +54,7 @@ namespace UserInterface
         {
             refreshButton.onClick.AddListener(delegate
             {
+                buttonClick.Play();
                 ToggleMenu(false);
                 LoadingBar.OpenMenu.Invoke(true);
                 PreviousMenu = this;
@@ -60,6 +63,7 @@ namespace UserInterface
             
             backToMenuButton.onClick.AddListener(delegate
             {
+                buttonClick.Play();
                 ToggleMenu(false);
                 MainMenu.OpenMenu(true);
                 Login.username = "";
@@ -68,6 +72,7 @@ namespace UserInterface
             
             backToGameButton.onClick.AddListener(delegate
             {
+                buttonClick.Play();
                 PreviousMenu = this;
                 ToggleMenu(false);
                 MainMenu.OpenPrimaryMenus(false);
@@ -76,6 +81,7 @@ namespace UserInterface
             
             logoutButton.onClick.AddListener(delegate
             {
+                buttonClick.Play();
                 ToggleMenu(false);
                 MainMenu.OpenMenu(true);
                 Login.LoggedIn = false;
@@ -111,6 +117,7 @@ namespace UserInterface
                 //button listener for each scene in viewport
                 button.onClick.AddListener(delegate
                 {
+                    buttonClick.Play();
                     DepopulateLayers(); //Get rid of the layers from the previous terrain
                     
                     //NewMenuManager.singleton.previouslyOpenedMenu = "CustomTerrains";
@@ -183,6 +190,7 @@ namespace UserInterface
 
                 toggle.onValueChanged.AddListener(t =>
                 {
+                    buttonClick.Play();
                     layer.transparency = toggle.isOn ? slider.value : 0;
                     //layerBackground.color = new Color32(198, 117, 63, 80);
 
@@ -343,6 +351,7 @@ namespace UserInterface
 
             exagReset.onClick.AddListener(delegate
             {
+                buttonClick.Play();
                 exagSlider.value = 1;
                 SceneMaterializer.singleton.terrain.transform.localScale = new Vector3(
                     SceneMaterializer.singleton.terrain.transform.localScale.x, 200,

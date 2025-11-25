@@ -16,6 +16,8 @@ namespace UserInterface
         public Button exitToGameButton;
         public bool loadedSampleTerrain;
 
+        [Header("Audio Cues")] public AudioSource buttonClick;
+        
         void Awake()
         {
             OpenMenu = ToggleMenu;
@@ -35,17 +37,22 @@ namespace UserInterface
         {
             foreach (Button button in terrainButtons)
             {
-                button.onClick.AddListener(delegate { LoadTerrain(button.GetComponent<DataPackBehaviour>()); });
+                button.onClick.AddListener(delegate
+                {
+                    StartCoroutine(LoadTerrain(button.GetComponent<DataPackBehaviour>()));
+                });
             }
 
             exitToMenuButton.onClick.AddListener(delegate
             {
+                buttonClick.Play();
                 ToggleMenu(false);
                 MainMenu.OpenMenu(true);
             });
             
             exitToGameButton.onClick.AddListener(delegate
             {
+                buttonClick.Play();
                 PreviousMenu = this;
                 ToggleMenu(false);
                 MainMenu.OpenPrimaryMenus(false);
@@ -53,13 +60,16 @@ namespace UserInterface
             });
         }
 
-        private void LoadTerrain(DataPackBehaviour datapack)
+        private IEnumerator LoadTerrain(DataPackBehaviour datapack)
         {
+            buttonClick.Play();
             PreviousMenu = this;
-            datapack.LoadData();
+            yield return new WaitForSeconds(0.001f);
+            
+            
             ToggleMenu(false);
             MainMenu.OpenPrimaryMenus(false);
-            
+            datapack.LoadData();
             loadedSampleTerrain = true;
         }
     }
