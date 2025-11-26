@@ -56,6 +56,8 @@ namespace UserInterface
         public Button clearMyPins;
         public Button settingButton;
         
+        [Header("Audio Cues")] public AudioSource buttonClick;
+
         // private vars
         private bool m_TutorialOpen;
         
@@ -111,24 +113,28 @@ namespace UserInterface
 
         public override void SetListeners()
         {
-             terrainMenuButton.onClick.AddListener(delegate
+            terrainMenuButton.onClick.AddListener(delegate
             {
+                buttonClick.Play();
                 ToggleTerrainsPanel(!PreviousMenu.parentObject.activeSelf);
             });
             perPixelButton.onClick.AddListener(delegate
             {
+                buttonClick.Play();
                 TogglePerPixelData(!perPixelPanel.activeSelf);
                 ToggleScaleBar(false);
                 colorPickerPanel.SetActive(false);
             });
             layersButton.onClick.AddListener(delegate
             {
+                buttonClick.Play();
                 ToggleLayersPanel(!terrainLayers.activeSelf);
                 ToggleScaleBar(false);
                 colorPickerPanel.SetActive(false);
             });
             multiplayerButton.onClick.AddListener(delegate
             {
+                buttonClick.Play();
                 ToggleMenu(false);
                 MainMenu.OpenPrimaryMenus(true);
                 MultiuserMenu.OpenMenu.Invoke(true);
@@ -137,12 +143,14 @@ namespace UserInterface
             });
             scaleBarButton.onClick.AddListener(delegate
             {
+                buttonClick.Play();
                 ToggleScaleBar(!scaleBarPanel.activeSelf);
                 ToggleLayersPanel(false);
                 TogglePerPixelData(false);
             });
             resetPosition.onClick.AddListener(delegate
             {
+                buttonClick.Play();
                 SceneMaterializer.singleton.terrain.transform.position = SceneMaterializer.singleton.terrainStartingPosition;
             });
             
@@ -150,6 +158,7 @@ namespace UserInterface
             {
                 if (!m_TutorialOpen)
                 {
+                    buttonClick.Play();
                     firstTutorial.SetActive(true);
                     m_TutorialOpen = true;
                     
@@ -162,6 +171,7 @@ namespace UserInterface
             
             settingButton.onClick.AddListener(delegate
             {
+                buttonClick.Play();
                 ToggleMenu(false);
                 ToggleTab(false);
                 

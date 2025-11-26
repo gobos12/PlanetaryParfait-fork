@@ -21,6 +21,8 @@ namespace UserInterface
         public Button exitToGameButton;
         public Button exitToDesktopButton;
 
+        [Header("Audio Cues")] public AudioSource buttonClick;
+
         void Awake()
         {
             Instance = this;
@@ -54,12 +56,14 @@ namespace UserInterface
         {
             sampleTerrainButton.onClick.AddListener(delegate
             {
+                buttonClick.Play();
                 ToggleMenu(false);
                 SampleTerrainsMenu.OpenMenu(true);
             });
             
             customTerrainButton.onClick.AddListener(delegate
             {
+                buttonClick.Play();
                 ToggleMenu(false);
                 PreviousMenu = this;
                 if (Login.LoggedIn) TerrainMenu.OpenMenu(true);
@@ -68,6 +72,7 @@ namespace UserInterface
             
             multiuserButton.onClick.AddListener(delegate
             {
+                buttonClick.Play();
                 ToggleMenu(false);
                 MultiuserMenu.OpenMenu(true);
             });
@@ -75,6 +80,7 @@ namespace UserInterface
             
             exitToGameButton.onClick.AddListener(delegate
             {
+                buttonClick.Play();
                 PreviousMenu = this;
                 ToggleMenu(false);
                 OpenPrimaryMenus(false);
@@ -83,6 +89,7 @@ namespace UserInterface
             
             exitToDesktopButton.onClick.AddListener(delegate
             {
+                buttonClick.Play();
                 ToggleMenu(false);
                 ConfirmQuit.Instance.ToggleMenu(true);
             });

@@ -15,29 +15,22 @@ namespace Multiuser
     /// <summary>
     /// Main script for creating/joining a multiuser server. 
     /// </summary>
-
     public class MultiplayerManager : MonoBehaviour
     {
         public static MultiplayerManager Instance { get; private set; } //Singleton instance
         public string joinCode;
-
         public string playerName = "";
 
-        //public VoiceChat _voiceChat;
+        public VoiceChat voiceChat;
+        [SerializeField] private bool developerMode;
 
         private void Awake() 
         {
             Instance = this;
             joinCode = "";
-
-            // Unity Authentication. Sign user in anonymously if they aren't already signed in.
+            
             SignInUserAnonymously();
-
-            //_voiceChat = GameObject.FindObjectOfType<VoiceChat>();
-
-            // Initialize Vivox Services -- Makes the Voice/Text chat work in Multiuser
-            //_voiceChat.InitializeVivox();
-            //_voiceChat.Login(); // login user into Vivox Services
+            //voiceChat = FindObjectOfType<VoiceChat>(); // TODO: instantiate on session start, destroy on session end
         }
 
         /// <summary>
@@ -55,8 +48,6 @@ namespace Multiuser
                 };
 
                 await AuthenticationService.Instance.SignInAnonymouslyAsync();
-
-                // Update Player name
                 playerName = "Player" + UnityEngine.Random.Range(10, 99);
             }
             //if there are exceptions, it keeps trying until user is authenticated
@@ -109,7 +100,7 @@ namespace Multiuser
                 NomenclatureDataReader.singleton.EnablePins();
                 LoadingBar.Loading(0.25f, "Loading Host Data");
                 
-                if (LoadingBar.Abort)
+                if (LoadingBar.Abort) // TODO: attach listener to loading bar
                 {
                     NetworkManager.Singleton.Shutdown();
                     GameState.InMultiuser = false;
@@ -123,11 +114,12 @@ namespace Multiuser
 
                 print("RELAY CODE " + joinCode);
 
-                // Join Vivox Channel -- Note: name of channel will be the Relay code for that particular server
-                //_voiceChat.JoinChannelMultiuser(joinCode);
-
+                /*if (developerMode)
+                    voiceChat.JoinTestChannelAsync();
+                else 
+                    voiceChat.JoinChannelAsync(joinCode);*/
             }
-            catch (Exception e) //when (e is RelayServiceException || e is TimeoutException)
+            catch (Exception e) //TODO: when (e is RelayServiceException || e is TimeoutException)
             {
                 Debug.LogError(e);
                 GameState.InMultiuser = false;
@@ -188,8 +180,10 @@ namespace Multiuser
                 TerrainTools.SetRoomCode();
                 MultiuserMenu.SetMultiplayerMenu();
 
-                // Join Vivox channel
-                //_voiceChat.JoinChannelMultiuser(joinCode);
+                /*if (developerMode)
+                    voiceChat.JoinTestChannelAsync();
+                else 
+                    voiceChat.JoinChannelAsync(joinCode);*/
             }
             catch (RelayServiceException e)
             {
@@ -208,7 +202,6 @@ namespace Multiuser
                     MultiuserMenu.TextMessage("Relay Error",
                         "Unable to connect to Relay servers. Please try again.");
                 }
-
             }
             catch (ArgumentNullException e)
             {
@@ -232,6 +225,15 @@ namespace Multiuser
             }
         }
 
+        public void LeaveRelay()
+        {
+            /*if (developerMode)
+                voiceChat.LeaveTestChannelAsync();
+            else 
+                voiceChat.LeaveChannelAsync(joinCode);*/
+            
+            NetworkManager.Singleton.Shutdown();
+        }
     }
 
 }

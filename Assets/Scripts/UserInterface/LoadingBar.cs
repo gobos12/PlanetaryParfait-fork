@@ -26,6 +26,10 @@ namespace UserInterface
         public Button exitButton;
         public TMP_Text loadingText;
         public TMP_Text loadingPercent;
+        
+        [Header("Audio Cues")] 
+        public AudioSource buttonClick;
+        public AudioSource loadingSound;
 
         void Awake()
         {
@@ -50,6 +54,7 @@ namespace UserInterface
         {
             exitButton.onClick.AddListener(delegate
             {
+                buttonClick.Play();
                 Abort = true;
                 SceneDownloader.singleton.StopAllCoroutines();
                 StartCoroutine(SceneDownloader.singleton.ChangeState(SceneDownloader.SceneSession.DONE));
@@ -63,6 +68,7 @@ namespace UserInterface
 
         private void UpdateValue(float value, string text)
         {
+            if (!loadingSound.isPlaying) loadingSound.Play();
             loadingBar.value += value;
             loadingPercent.text = Math.Round(loadingBar.value, 2) * 100 + "%";
             loadingText.text = text;
@@ -70,6 +76,7 @@ namespace UserInterface
 
         private void CloseMenu(float value, string text)
         {
+            loadingSound.Stop();
             parentObject.SetActive(false);
             loadingBar.value = value;
 

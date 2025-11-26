@@ -26,8 +26,10 @@ namespace UserInterface
         public Button signInBackButton;
         public TMP_Text notificationText;
 
-        public static string username, password;
+        public static string username = "", password = "";
         private bool canTab = false, canEnter = false;
+        
+        [Header("Audio Cues")] public AudioSource buttonClick;
 
         void Awake()
         {
@@ -56,10 +58,15 @@ namespace UserInterface
 
         public override void SetListeners()
         {
-            loginButton.onClick.AddListener(GetLoginInfo);
+            loginButton.onClick.AddListener(delegate
+            {
+                buttonClick.Play();
+                GetLoginInfo();
+            });
 
             signInBackButton.onClick.AddListener(delegate
             {
+                buttonClick.Play();
                 ToggleMenu(false);
                 MainMenu.OpenMenu.Invoke(true);
                 if(GameState.IsVR) vrKeyboard.gameObject.SetActive(false);

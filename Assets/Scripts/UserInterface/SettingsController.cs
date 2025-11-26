@@ -31,6 +31,8 @@ namespace UserInterface{
         public UnityEngine.UI.Button exitButton;
         public XRController vrPlayer;
 
+        [Header("Audio Cues")] public AudioSource buttonClick;
+
         // Start is called before the first frame update
         void Awake()
         {
@@ -79,6 +81,7 @@ namespace UserInterface{
             
             exitButton.onClick.AddListener(delegate
             {
+                buttonClick.Play();
                 ToggleMenu(false);
                 MainMenu.OpenPrimaryMenus(false);
                 TerrainTools.OpenMenu(true);
