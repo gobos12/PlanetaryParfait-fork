@@ -43,20 +43,40 @@ namespace UserInterface
         public TMP_Text perPixelData;
         public TMP_Text roomCodeText;
         public TMP_Text generalTip;
-        
-        [Header("Buttons")]
-        public Button perPixelButton;
-        public Button multiplayerButton;
-        public Button scaleBarButton;
-        public Button helpButton;
-        public Button layersButton;
-        public Button terrainMenuButton;
-        public Button resetPosition;
+
+        [Header("Buttons")] 
+        public Button vrPP;
+        public Button desktopPP;
+        public Button vrMultiuser;
+        public Button desktopMultiuser;
+        public Button vrScalebar;
+        public Button desktopScalebar;
+        public Button vrHelp;
+        public Button desktopHelp;
+        public Button vrLayers;
+        public Button desktopLayers;
+        public Button vrTerrains;
+        public Button desktopTerrains;
+        public Button vrReset;
+        public Button desktopReset;
+        public Button vrSettings;
+        public Button desktopSettings;
+
+        private Button perPixelButton;
+        private Button multiplayerButton;
+        private Button scaleBarButton;
+        private Button helpButton;
+        private Button layersButton;
+        private Button terrainMenuButton;
+        private Button resetPosition;
         public Button clearAllPins;
         public Button clearMyPins;
-        public Button settingButton;
+        private Button settingButton;
         
         [Header("Audio Cues")] public AudioSource buttonClick;
+
+        public GameObject desktopTools;
+        public GameObject vrTools;
 
         // private vars
         private bool m_TutorialOpen;
@@ -74,6 +94,18 @@ namespace UserInterface
             SetClientUI = SetClientToolbar;
             SetRoomCode = RoomCodeUI;
             DynamicReadout = ReadData;
+
+            vrTools.SetActive(GameState.IsVR);
+            desktopTools.SetActive(!GameState.IsVR);
+            
+            perPixelButton = GameState.IsVR ? vrPP : desktopPP;
+            multiplayerButton = GameState.IsVR ? vrMultiuser : desktopMultiuser;
+            scaleBarButton = GameState.IsVR ? vrScalebar : desktopScalebar;
+            helpButton = GameState.IsVR ? vrHelp : desktopHelp;
+            layersButton = GameState.IsVR ? vrLayers : desktopLayers;
+            terrainMenuButton = GameState.IsVR ? vrTerrains : desktopTerrains;
+            resetPosition = GameState.IsVR ? vrReset : desktopReset;
+            settingButton = GameState.IsVR ? vrSettings : desktopSettings;
         }
 
         new void Start()
@@ -86,7 +118,7 @@ namespace UserInterface
             {
                 tabImg.gameObject.SetActive(false);
                 shiftImg.gameObject.SetActive(false);
-                generalTip.text = "Pull Trigger to Interact with Toolbar";
+                //generalTip.text = "Pull Trigger to Interact with Toolbar";
             }
             else
             {

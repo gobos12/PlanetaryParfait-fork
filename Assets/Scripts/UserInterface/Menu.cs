@@ -21,7 +21,15 @@ namespace UserInterface
        public GameObject player;
        [HideInInspector] public VRUIKeyboard vrKeyboard;
        protected static Menu PreviousMenu;
-       
+
+       void Awake()
+       {
+           if (GameState.IsVR)
+           {
+               XRController xrRig = (XRController)GameObject.FindGameObjectWithTag("Player").GetComponent(typeof(XRController));
+               transform.GetChild(0).parent = xrRig.leftController.transform;
+           }
+       }
         public virtual void Start()
         {
             LockCursor = ToggleCursorMode;
