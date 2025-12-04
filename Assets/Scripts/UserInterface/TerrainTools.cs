@@ -130,8 +130,6 @@ namespace UserInterface
         {
             resetPosition.gameObject.SetActive(SceneMaterializer.singleton.terrain.transform.position !=
                                                SceneMaterializer.singleton.terrainStartingPosition);
-
-            if(GameState.IsVR) InfoPanel.Panel.DimText(perPixelPanel.activeSelf || terrainLayers.activeSelf || scaleBarPanel.activeSelf || m_TutorialOpen);
         }
         
         #endregion
@@ -155,14 +153,14 @@ namespace UserInterface
                 buttonClick.Play();
                 TogglePerPixelData(!perPixelPanel.activeSelf);
                 ToggleScaleBar(false);
-                colorPickerPanel.SetActive(false);
+                if(GameState.IsVR) ToggleLayersPanel(false);
             });
             layersButton.onClick.AddListener(delegate
             {
                 buttonClick.Play();
                 ToggleLayersPanel(!terrainLayers.activeSelf);
                 ToggleScaleBar(false);
-                colorPickerPanel.SetActive(false);
+                if(GameState.IsVR) TogglePerPixelData(false);
             });
             multiplayerButton.onClick.AddListener(delegate
             {

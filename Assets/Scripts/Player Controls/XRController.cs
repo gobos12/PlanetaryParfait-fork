@@ -27,6 +27,10 @@ public class XRController : MonoBehaviour,
     public GameObject leftController;
     public GameObject rightController;
     
+    public GameObject buttonHints;
+    public GameObject platformButtonHints;
+    public GameObject walkButtonHint;
+    
     private GameObject playersListGameObject;
     private GameObject temp;
     private GameObject menu;
@@ -139,12 +143,17 @@ public class XRController : MonoBehaviour,
 
     public void OnSelect(InputAction.CallbackContext context)
     {
-        if(!context.ToString().Contains("RightHand"))
+        if (!context.ToString().Contains("RightHand"))
+        {
             menu.SetActive(context.performed);
+            buttonHints.SetActive(!context.performed); // turn off button hints while menu is open to prevent UI overlapping
+        }
         else if (!context.ToString().Contains("LeftHand"))
         {
             rightGripActive = context.performed;
             gameObject.GetComponent<ContinuousMoveProviderBase>().enabled = !rightGripActive;
+            platformButtonHints.SetActive(context.performed); // turn on platform button hints while platform mode is active
+            walkButtonHint.SetActive(!context.performed);
         }
     }
 
