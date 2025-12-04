@@ -46,6 +46,6 @@ public class ToolbarPanels : MonoBehaviour
         scalebarPanel.anchoredPosition = GameState.IsVR ? scalebarVR : scalebarDesktop;
         layersPanel.anchoredPosition = GameState.IsVR ? layersVR : layersDesktop;
         colorPickerPanel.anchoredPosition = GameState.IsVR ? colorPickerVR : colorPickerDesktop;
-        roomCodePanel.anchoredPosition = GameState.IsVR ? roomCodeVR : roomCodeDesktop;
+        // roomCodePanel.anchoredPosition = GameState.IsVR ? roomCodeVR : roomCodeDesktop;
     }
 }

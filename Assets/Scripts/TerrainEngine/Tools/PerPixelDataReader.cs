@@ -5,6 +5,9 @@ using UnityEngine;
 using UserInterface;
 using Multiuser.Sync;
 using Unity.Netcode;
+using UnityEngine.EventSystems;
+using UnityEngine.XR.Interaction.Toolkit;
+using UnityEngine.XR.Interaction.Toolkit.UI;
 using XRController = XRControls.XRController;
 
 namespace TerrainEngine.Tools
@@ -46,6 +49,8 @@ namespace TerrainEngine.Tools
         // VR-related Variables
         [SerializeField] private XRController controlCheck; // determines if we are pressing the button in VR
         [SerializeField] private GameObject vrController;
+        private XRRayInteractor rayInterator;
+        private bool interactingWithUI;
         private bool printOnce; // ensures that a Pin is spawned into a scene once. Prevents scale bar from spawning every frame in VR
 
 
@@ -83,10 +88,13 @@ namespace TerrainEngine.Tools
         {
             singleton = this;
             pinList = new List<Pin>();
-            
+
             if(GameState.IsVR)
             {
                 controlCheck = GameObject.FindGameObjectWithTag("Player").GetComponent<XRController>();
+                rayInterator = vrController.GetComponent<XRRayInteractor>();
+                rayInterator.uiHoverEntered.AddListener(delegate(UIHoverEventArgs arg0) { interactingWithUI = true; });
+                rayInterator.uiHoverExited.AddListener(delegate(UIHoverEventArgs arg0) { interactingWithUI = false; });
             }
             
             heightTexture = material.GetTexture("_HeightMap") as Texture2D;
@@ -270,9 +278,9 @@ namespace TerrainEngine.Tools
                     {
                         dataOutput = floatOutput + intOutput + byteOutput + shortOutput;
                     }
-                    
+
                     //placing pins
-                    if (Input.GetMouseButtonDown(1) || (controlCheck.triggerActive && controlCheck.leftHandActive && !printOnce))
+                    if (Input.GetMouseButtonDown(1) || (controlCheck.triggerActive && controlCheck.rightHandActive && !printOnce && !interactingWithUI))
                     {
                         SpawnPin(ray_t, dataOutput, SceneDownloader.singleton.guid);
                         printOnce = true; 

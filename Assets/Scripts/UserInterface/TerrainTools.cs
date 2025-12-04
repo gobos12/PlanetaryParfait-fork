@@ -4,6 +4,7 @@ using TerrainEngine.Tools;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 using Button = UnityEngine.UI.Button;
@@ -147,6 +148,7 @@ namespace UserInterface
             {
                 buttonClick.Play();
                 ToggleTerrainsPanel(!PreviousMenu.parentObject.activeSelf);
+                Deselect();  
             });
             perPixelButton.onClick.AddListener(delegate
             {
@@ -154,6 +156,7 @@ namespace UserInterface
                 TogglePerPixelData(!perPixelPanel.activeSelf);
                 ToggleScaleBar(false);
                 if(GameState.IsVR) ToggleLayersPanel(false);
+                Deselect();  
             });
             layersButton.onClick.AddListener(delegate
             {
@@ -161,6 +164,7 @@ namespace UserInterface
                 ToggleLayersPanel(!terrainLayers.activeSelf);
                 ToggleScaleBar(false);
                 if(GameState.IsVR) TogglePerPixelData(false);
+                Deselect();  
             });
             multiplayerButton.onClick.AddListener(delegate
             {
@@ -177,11 +181,13 @@ namespace UserInterface
                 ToggleScaleBar(!scaleBarPanel.activeSelf);
                 ToggleLayersPanel(false);
                 TogglePerPixelData(false);
+                Deselect();  
             });
             resetPosition.onClick.AddListener(delegate
             {
                 buttonClick.Play();
                 SceneMaterializer.singleton.terrain.transform.position = SceneMaterializer.singleton.terrainStartingPosition;
+                Deselect();  
             });
             
             helpButton.onClick.AddListener(delegate
@@ -207,6 +213,7 @@ namespace UserInterface
                 
                 MainMenu.OpenPrimaryMenus(true);
                 SettingsController.OpenMenu(true);
+                Deselect();  
             });
         }
         
@@ -312,7 +319,7 @@ namespace UserInterface
         /// </summary>
         private void RoomCodeUI()
         {
-            if (GameState.InMultiuser)
+            if (GameState.InMultiuser && !GameState.IsVR) //currently disable roomcode panel for VR users
             {
                 roomCodePanel.SetActive(true);
                 roomCodeText.text = "Room Code: " + MultiplayerManager.Instance.joinCode;
@@ -322,6 +329,14 @@ namespace UserInterface
                 roomCodePanel.SetActive(false);
                 roomCodeText.text = string.Empty;
             }
+        }
+
+        /// <summary>
+        /// Removes current "selected" object so UI image changes (like changing the color of a button when hovering over it) can fire on the last selected object
+        /// </summary>
+        private void Deselect()
+        {
+            EventSystem.current.SetSelectedGameObject(null);
         }
         
         #endregion

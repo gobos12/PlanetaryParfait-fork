@@ -3,6 +3,7 @@ using UnityEngine.InputSystem;
 using UserInterface;
 using TerrainEngine.Tools;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.XR.Interaction.Toolkit;
 
 namespace XRControls
@@ -39,7 +40,7 @@ public class XRController : MonoBehaviour,
     [HideInInspector] public bool hovering;
     [HideInInspector] public bool joystickActive;
     [HideInInspector] public bool triggerActive;
-    [HideInInspector] public bool leftHandActive; 
+    [FormerlySerializedAs("leftHandActive")] [HideInInspector] public bool rightHandActive; 
     [HideInInspector] public bool leftGripActive;
     [HideInInspector] public bool rightGripActive;
     [HideInInspector] public bool xActive;
@@ -165,7 +166,7 @@ public class XRController : MonoBehaviour,
     public void OnActivate(InputAction.CallbackContext context)
     {
         triggerActive = context.performed; // the action is completed
-        leftHandActive = context.ToString().Contains("LeftHand");
+        rightHandActive = context.ToString().Contains("RightHand");
 
         if (context.performed)
         {
