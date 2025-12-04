@@ -35,10 +35,6 @@ public class ToolbarPanels : MonoBehaviour
     
     void Start()
     {
-        print("1. " + colorPickerPanel.transform.position);
-        print("2. " + colorPickerPanel.transform.localPosition);
-        print("3. " + colorPickerPanel.anchoredPosition);
-        
         if (GameState.IsVR)
         {
             perPixelPanel.transform.parent = perPixelButtonTransform;
