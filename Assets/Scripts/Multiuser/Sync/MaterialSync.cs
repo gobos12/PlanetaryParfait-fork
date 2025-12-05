@@ -52,11 +52,11 @@ namespace Multiuser.Sync
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
-
+            NetworkManager.OnClientConnectedCallback += OnClientConnectedCallback;
             if (IsHost)
             {
                 terrainURL = SceneDownloader.singleton.terrainURL;
-                NetworkManager.OnClientConnectedCallback += OnClientConnectedCallback;
+                
             }
             /*else
             {
@@ -67,10 +67,7 @@ namespace Multiuser.Sync
         public override void OnNetworkDespawn()
         {
             base.OnNetworkDespawn();
-            if (IsHost)
-            {
-                NetworkManager.OnClientDisconnectCallback -= OnClientConnectedCallback;
-            }
+            NetworkManager.OnClientDisconnectCallback -= OnClientConnectedCallback;
 
         }
 
@@ -174,12 +171,14 @@ namespace Multiuser.Sync
 
         public override void OnNetworkSpawn()
         {
-            NetworkManager.CustomMessagingManager.OnUnnamedMessage += ReceiveMessage;
+            if(NetworkManager != null)
+                NetworkManager.CustomMessagingManager.OnUnnamedMessage += ReceiveMessage;
         }
 
         public override void OnNetworkDespawn()
         {
-            NetworkManager.CustomMessagingManager.OnUnnamedMessage -= ReceiveMessage;
+            if(NetworkManager != null && NetworkManager.CustomMessagingManager != null)
+                NetworkManager.CustomMessagingManager.OnUnnamedMessage -= ReceiveMessage;
         }
 
         /// <summary>

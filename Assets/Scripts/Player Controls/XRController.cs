@@ -3,6 +3,7 @@ using UnityEngine.InputSystem;
 using UserInterface;
 using TerrainEngine.Tools;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.XR.Interaction.Toolkit;
 
 namespace XRControls
@@ -24,15 +25,24 @@ public class XRController : MonoBehaviour,
     [Header("GameObjects")]
     public GameObject player;
     public Transform terrainTiles;
+    public GameObject leftController;
+    public GameObject rightController;
+    
+    public GameObject buttonHints;
+    public GameObject platformButtonHints;
+    public GameObject walkButtonHint;
+    
     private GameObject playersListGameObject;
     private GameObject temp;
+    private GameObject menu;
 
     [Header("Interaction Types")]
     [HideInInspector] public bool hovering;
     [HideInInspector] public bool joystickActive;
     [HideInInspector] public bool triggerActive;
-    [HideInInspector] public bool leftHandActive; 
-    [HideInInspector] public bool gripActive;
+    [FormerlySerializedAs("leftHandActive")] [HideInInspector] public bool rightHandActive; 
+    [HideInInspector] public bool leftGripActive;
+    [HideInInspector] public bool rightGripActive;
     [HideInInspector] public bool xActive;
     [HideInInspector] public bool yActive;
     [HideInInspector] public bool aActive;
@@ -52,6 +62,9 @@ public class XRController : MonoBehaviour,
         controls.XRIRightHandLocomotion.SetCallbacks(this);
         controls.XRILeftHandLocomotion.SetCallbacks(this);
         controls.Enable();
+        
+        menu = GameObject.FindGameObjectWithTag("Menu");
+        menu.SetActive(false);
     }
     
     private void Update()
@@ -83,45 +96,41 @@ public class XRController : MonoBehaviour,
     /// </summary>
     private void MovePlatform()
     {
-        gameObject.GetComponent<ContinuousMoveProviderBase>().enabled = !gripActive;
+        if (!rightGripActive) return;
+        Vector3 inputDirection = transform.right * movePlatform.x + transform.forward * movePlatform.y;
+        terrainTiles.position = Vector3.MoveTowards(terrainTiles.gameObject.transform.position, terrainTiles.position - inputDirection, SettingsController.PlatformSpeed() * Time.deltaTime);
 
-        if (gripActive)
+        //moving pins
+        foreach (Pin _pin in PerPixelDataReader.pinList)
         {
-            Vector3 inputDirection = transform.right * movePlatform.x + transform.forward * movePlatform.y;
-            terrainTiles.position = Vector3.MoveTowards(terrainTiles.gameObject.transform.position, terrainTiles.position - inputDirection, SettingsController.PlatformSpeed() * Time.deltaTime);
+            _pin.pin.transform.position = Vector3.MoveTowards(_pin.pin.transform.position, _pin.pin.transform.position - new Vector3(player.GetComponentInChildren<Camera>().transform.forward.x, 0f, player.GetComponentInChildren<Camera>().transform.forward.z), SettingsController.PlatformSpeed() * Time.deltaTime);
+            _pin.panel.transform.position = Vector3.MoveTowards(_pin.panel.transform.position, _pin.panel.transform.position - new Vector3(player.GetComponentInChildren<Camera>().transform.forward.x, 0f, player.GetComponentInChildren<Camera>().transform.forward.z), SettingsController.PlatformSpeed() * Time.deltaTime);
+        }
+            
+        //moving platform UP
+        if (yActive)
+        {
+            terrainTiles.position = Vector3.MoveTowards(terrainTiles.gameObject.transform.position, terrainTiles.position + Vector3.down, 5 * Time.deltaTime);
 
             //moving pins
             foreach (Pin _pin in PerPixelDataReader.pinList)
             {
-                _pin.pin.transform.position = Vector3.MoveTowards(_pin.pin.transform.position, _pin.pin.transform.position - new Vector3(player.GetComponentInChildren<Camera>().transform.forward.x, 0f, player.GetComponentInChildren<Camera>().transform.forward.z), SettingsController.PlatformSpeed() * Time.deltaTime);
-                _pin.panel.transform.position = Vector3.MoveTowards(_pin.panel.transform.position, _pin.panel.transform.position - new Vector3(player.GetComponentInChildren<Camera>().transform.forward.x, 0f, player.GetComponentInChildren<Camera>().transform.forward.z), SettingsController.PlatformSpeed() * Time.deltaTime);
+                _pin.pin.transform.position = Vector3.MoveTowards(_pin.pin.transform.position, _pin.pin.transform.position + Vector3.down, SettingsController.PlatformSpeed() * Time.deltaTime);
+                _pin.panel.transform.position = Vector3.MoveTowards(_pin.panel.transform.position, _pin.panel.transform.position + Vector3.down, SettingsController.PlatformSpeed() * Time.deltaTime);
             }
+        }
             
-            //moving platform UP
-            if (yActive)
-            {
-                terrainTiles.position = Vector3.MoveTowards(terrainTiles.gameObject.transform.position, terrainTiles.position + Vector3.down, 5 * Time.deltaTime);
+        //moving platform DOWN
+        if (xActive)
+        {
+            terrainTiles.position = Vector3.MoveTowards(terrainTiles.gameObject.transform.position, terrainTiles.position + Vector3.up, 5 * Time.deltaTime);
 
-                //moving pins
-                foreach (Pin _pin in PerPixelDataReader.pinList)
-                {
-                    _pin.pin.transform.position = Vector3.MoveTowards(_pin.pin.transform.position, _pin.pin.transform.position + Vector3.down, SettingsController.PlatformSpeed() * Time.deltaTime);
-                    _pin.panel.transform.position = Vector3.MoveTowards(_pin.panel.transform.position, _pin.panel.transform.position + Vector3.down, SettingsController.PlatformSpeed() * Time.deltaTime);
-                }
+            //moving pins
+            foreach (Pin _pin in PerPixelDataReader.pinList)
+            {
+                _pin.pin.transform.position = Vector3.MoveTowards(_pin.pin.transform.position, _pin.pin.transform.position + Vector3.up, SettingsController.PlatformSpeed() * Time.deltaTime);
+                _pin.panel.transform.position = Vector3.MoveTowards(_pin.panel.transform.position, _pin.panel.transform.position + Vector3.up, SettingsController.PlatformSpeed() * Time.deltaTime);
             }
-            
-            //moving platform DOWN
-            if (xActive)
-            {
-                terrainTiles.position = Vector3.MoveTowards(terrainTiles.gameObject.transform.position, terrainTiles.position + Vector3.up, 5 * Time.deltaTime);
-
-                //moving pins
-                foreach (Pin _pin in PerPixelDataReader.pinList)
-                {
-                    _pin.pin.transform.position = Vector3.MoveTowards(_pin.pin.transform.position, _pin.pin.transform.position + Vector3.up, SettingsController.PlatformSpeed() * Time.deltaTime);
-                    _pin.panel.transform.position = Vector3.MoveTowards(_pin.panel.transform.position, _pin.panel.transform.position + Vector3.up, SettingsController.PlatformSpeed() * Time.deltaTime);
-                }
-            }   
         }
     }
 
@@ -135,7 +144,18 @@ public class XRController : MonoBehaviour,
 
     public void OnSelect(InputAction.CallbackContext context)
     {
-        gripActive = context.performed;
+        if (!context.ToString().Contains("RightHand"))
+        {
+            menu.SetActive(context.performed);
+            buttonHints.SetActive(!context.performed); // turn off button hints while menu is open to prevent UI overlapping
+        }
+        else if (!context.ToString().Contains("LeftHand"))
+        {
+            rightGripActive = context.performed;
+            gameObject.GetComponent<ContinuousMoveProviderBase>().enabled = !rightGripActive;
+            platformButtonHints.SetActive(context.performed); // turn on platform button hints while platform mode is active
+            walkButtonHint.SetActive(!context.performed);
+        }
     }
 
     public void OnSelectValue(InputAction.CallbackContext context)
@@ -146,7 +166,7 @@ public class XRController : MonoBehaviour,
     public void OnActivate(InputAction.CallbackContext context)
     {
         triggerActive = context.performed; // the action is completed
-        leftHandActive = context.ToString().Contains("LeftHand");
+        rightHandActive = context.ToString().Contains("RightHand");
 
         if (context.performed)
         {
@@ -155,8 +175,6 @@ public class XRController : MonoBehaviour,
                 ToggleGameObject(temp);
             }
         }
-        
-        
     }
 
     public void OnActivateValue(InputAction.CallbackContext context)
@@ -207,6 +225,7 @@ public class XRController : MonoBehaviour,
     public void OnMove(InputAction.CallbackContext context)
     {
         joystickActive = context.performed;
+        print(joystickActive);
         movePlatform = context.ReadValue<Vector2>();
     }
 
@@ -241,9 +260,8 @@ public class XRController : MonoBehaviour,
 
     public void OnGripActive(InputAction.CallbackContext context)
     {
-       //throw new NotImplementedException();
-    }
 
+    }
 
     #endregion
 

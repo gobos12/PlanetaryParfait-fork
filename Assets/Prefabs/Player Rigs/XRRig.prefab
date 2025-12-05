@@ -492,11 +492,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   player: {fileID: 7359205860212032560}
   terrainTiles: {fileID: 0}
+  leftController: {fileID: 0}
+  rightController: {fileID: 0}
+  buttonHints: {fileID: 0}
+  platformButtonHints: {fileID: 0}
   hovering: 0
   joystickActive: 0
   triggerActive: 0
   leftHandActive: 0
-  gripActive: 0
+  leftGripActive: 0
+  rightGripActive: 0
   xActive: 0
   yActive: 0
   aActive: 0
@@ -873,6 +878,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5210475027206488165, guid: 36a51bd584fade34abca7b4bf27fad5a,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6422341771801002059, guid: 36a51bd584fade34abca7b4bf27fad5a,
         type: 3}

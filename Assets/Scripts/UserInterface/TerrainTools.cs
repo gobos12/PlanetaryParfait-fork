@@ -4,6 +4,7 @@ using TerrainEngine.Tools;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 using Button = UnityEngine.UI.Button;
@@ -43,20 +44,40 @@ namespace UserInterface
         public TMP_Text perPixelData;
         public TMP_Text roomCodeText;
         public TMP_Text generalTip;
-        
-        [Header("Buttons")]
-        public Button perPixelButton;
-        public Button multiplayerButton;
-        public Button scaleBarButton;
-        public Button helpButton;
-        public Button layersButton;
-        public Button terrainMenuButton;
-        public Button resetPosition;
+
+        [Header("Buttons")] 
+        public Button vrPP;
+        public Button desktopPP;
+        public Button vrMultiuser;
+        public Button desktopMultiuser;
+        public Button vrScalebar;
+        public Button desktopScalebar;
+        public Button vrHelp;
+        public Button desktopHelp;
+        public Button vrLayers;
+        public Button desktopLayers;
+        public Button vrTerrains;
+        public Button desktopTerrains;
+        public Button vrReset;
+        public Button desktopReset;
+        public Button vrSettings;
+        public Button desktopSettings;
+
+        private Button perPixelButton;
+        private Button multiplayerButton;
+        private Button scaleBarButton;
+        private Button helpButton;
+        private Button layersButton;
+        private Button terrainMenuButton;
+        private Button resetPosition;
         public Button clearAllPins;
         public Button clearMyPins;
-        public Button settingButton;
+        private Button settingButton;
         
         [Header("Audio Cues")] public AudioSource buttonClick;
+
+        public GameObject desktopTools;
+        public GameObject vrTools;
 
         // private vars
         private bool m_TutorialOpen;
@@ -74,6 +95,18 @@ namespace UserInterface
             SetClientUI = SetClientToolbar;
             SetRoomCode = RoomCodeUI;
             DynamicReadout = ReadData;
+
+            vrTools.SetActive(GameState.IsVR);
+            desktopTools.SetActive(!GameState.IsVR);
+            
+            perPixelButton = GameState.IsVR ? vrPP : desktopPP;
+            multiplayerButton = GameState.IsVR ? vrMultiuser : desktopMultiuser;
+            scaleBarButton = GameState.IsVR ? vrScalebar : desktopScalebar;
+            helpButton = GameState.IsVR ? vrHelp : desktopHelp;
+            layersButton = GameState.IsVR ? vrLayers : desktopLayers;
+            terrainMenuButton = GameState.IsVR ? vrTerrains : desktopTerrains;
+            resetPosition = GameState.IsVR ? vrReset : desktopReset;
+            settingButton = GameState.IsVR ? vrSettings : desktopSettings;
         }
 
         new void Start()
@@ -86,7 +119,7 @@ namespace UserInterface
             {
                 tabImg.gameObject.SetActive(false);
                 shiftImg.gameObject.SetActive(false);
-                generalTip.text = "Pull Trigger to Interact with Toolbar";
+                //generalTip.text = "Pull Trigger to Interact with Toolbar";
             }
             else
             {
@@ -98,8 +131,6 @@ namespace UserInterface
         {
             resetPosition.gameObject.SetActive(SceneMaterializer.singleton.terrain.transform.position !=
                                                SceneMaterializer.singleton.terrainStartingPosition);
-
-            if(GameState.IsVR) InfoPanel.Panel.DimText(perPixelPanel.activeSelf || terrainLayers.activeSelf || scaleBarPanel.activeSelf || m_TutorialOpen);
         }
         
         #endregion
@@ -117,20 +148,23 @@ namespace UserInterface
             {
                 buttonClick.Play();
                 ToggleTerrainsPanel(!PreviousMenu.parentObject.activeSelf);
+                Deselect();  
             });
             perPixelButton.onClick.AddListener(delegate
             {
                 buttonClick.Play();
                 TogglePerPixelData(!perPixelPanel.activeSelf);
                 ToggleScaleBar(false);
-                colorPickerPanel.SetActive(false);
+                if(GameState.IsVR) ToggleLayersPanel(false);
+                Deselect();  
             });
             layersButton.onClick.AddListener(delegate
             {
                 buttonClick.Play();
                 ToggleLayersPanel(!terrainLayers.activeSelf);
                 ToggleScaleBar(false);
-                colorPickerPanel.SetActive(false);
+                if(GameState.IsVR) TogglePerPixelData(false);
+                Deselect();  
             });
             multiplayerButton.onClick.AddListener(delegate
             {
@@ -147,11 +181,13 @@ namespace UserInterface
                 ToggleScaleBar(!scaleBarPanel.activeSelf);
                 ToggleLayersPanel(false);
                 TogglePerPixelData(false);
+                Deselect();  
             });
             resetPosition.onClick.AddListener(delegate
             {
                 buttonClick.Play();
                 SceneMaterializer.singleton.terrain.transform.position = SceneMaterializer.singleton.terrainStartingPosition;
+                Deselect();  
             });
             
             helpButton.onClick.AddListener(delegate
@@ -177,6 +213,7 @@ namespace UserInterface
                 
                 MainMenu.OpenPrimaryMenus(true);
                 SettingsController.OpenMenu(true);
+                Deselect();  
             });
         }
         
@@ -282,7 +319,7 @@ namespace UserInterface
         /// </summary>
         private void RoomCodeUI()
         {
-            if (GameState.InMultiuser)
+            if (GameState.InMultiuser && !GameState.IsVR) //currently disable roomcode panel for VR users
             {
                 roomCodePanel.SetActive(true);
                 roomCodeText.text = "Room Code: " + MultiplayerManager.Instance.joinCode;
@@ -292,6 +329,14 @@ namespace UserInterface
                 roomCodePanel.SetActive(false);
                 roomCodeText.text = string.Empty;
             }
+        }
+
+        /// <summary>
+        /// Removes current "selected" object so UI image changes (like changing the color of a button when hovering over it) can fire on the last selected object
+        /// </summary>
+        private void Deselect()
+        {
+            EventSystem.current.SetSelectedGameObject(null);
         }
         
         #endregion

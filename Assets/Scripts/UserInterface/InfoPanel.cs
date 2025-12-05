@@ -24,12 +24,6 @@ namespace UserInterface
         private void Start()
         {
             Panel = this;
-            if(!GameState.IsVR) TogglePanel(true); // always stays on in desktop
-        }
-
-        private void Update()
-        {
-            if(GameState.IsVR) InfoPanel.Panel.TogglePanel(GameState.InTerrain && !MainMenu.Instance.PrimaryMenus.activeSelf);
         }
 
         /// <summary>

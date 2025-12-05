@@ -75,7 +75,6 @@ namespace XRControls{
         private float _animationBlend;
         private float _rotationVelocity;
         private float _verticalVelocity;
-        private float _terminalVelocity = 53.0f;
         
         // timeout deltatime
         private float _jumpTimeoutDelta;
@@ -171,7 +170,7 @@ namespace XRControls{
         #endregion
 
 
-        #region SPECIFIC
+        #region METHODS
         
         private void AssignAnimationIDs() {
             _animIDSpeed = Animator.StringToHash("Speed");
