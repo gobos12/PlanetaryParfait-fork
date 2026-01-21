@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
 using UnityEngine;
@@ -102,7 +103,7 @@ namespace TerrainEngine
                 case SceneSession.READY:
                     SceneMaterializer.singleton.SetMaterials(scene);
                     SceneMaterializer.singleton.selectedScene = scene;
-                    if(nomenclature != null) NomenclatureDataReader.singleton.InstantiateNomenclature(nomenclature);
+                    if(nomenclature.text_data.Count == 0) NomenclatureDataReader.singleton.InstantiateNomenclature(nomenclature);
                     
                     InfoPanel.Panel.UpdateInfo(scene);
                     ScaleBar.singleton.CalculatePrefabs(scene);
@@ -185,7 +186,7 @@ namespace TerrainEngine
             dataLayers.Clear();
             PerPixelDataReader.singleton.ClearPerPixelData();
             NomenclatureDataReader.singleton.DeleteNomenclature();
-            nomenclature = null;
+            nomenclature.text_data.Clear();
             //terrainURL = ""; //resets terrain URL
             
             // Download json for individual scene
@@ -282,7 +283,7 @@ namespace TerrainEngine
                 LoadingBar.Loading(0.05f, "Configuring Height Data");
                 switch (dataType)
                 {
-                    case "float": //32-bit float
+                    case "float" or "double": //32-bit float
                         DataToHeightMapFloat(downloadHandler, width, height);
                         break;
                     case "short": //16-bit int
@@ -466,8 +467,21 @@ namespace TerrainEngine
                 }
             }
         }
-        
-        
+
+        private void SaveHeightData(float[] data)
+        {
+            string filename = "data.txt";
+            string path = Path.Combine("Assets/Resources/", filename);
+            try
+            {
+                File.WriteAllLines(path, data.Select(i => i.ToString()).ToArray());
+                Debug.Log("saved data to " + path);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e);
+            }
+        }
 
         /// <summary>
         /// Convert byte data for height map into a 2D texture
@@ -506,14 +520,22 @@ namespace TerrainEngine
             
             var floatArray = new float[newnewpixels.Length / 4];
             Buffer.BlockCopy(newnewpixels, 0, floatArray, 0, newnewpixels.Length);
-
-            var max = floatArray.Max();
-            var min = floatArray.Min();
-            var mid = (max + min) / 2;
+            
+            var max = floatArray.Where(x => !float.IsNaN(x)).Max();
+            var min = floatArray.Where(x => !float.IsNaN(x) && x > -32000).Min();
+            var mid = Convert.ToSingle((max + min) / 2.00);
+            print($"Max: {max}, Min: {min}, Mid: {mid}");
+            print($"Array length: {floatByteArray.Length}, image width: {width}, image height: {height}");
+            //SaveHeightData(floatArray);
 
             for (int i = 0; i < floatArray.Length; i++)
             {
-                floatArray[i] += -mid;
+                if (float.IsNaN(floatArray[i]))
+                {
+                    floatArray[i] = mid;
+                    print(floatArray[i]);
+                }
+                else floatArray[i] += -mid;
             }
 
             heightData = floatArray;
@@ -579,6 +601,49 @@ namespace TerrainEngine
 
             _texture = new Texture2D(width, height, TextureFormat.RFloat, false);
             _texture.LoadRawTextureData(floatByteArray);
+            _texture.Apply();
+            return _texture;
+        }
+
+        public Texture2D DataToHeightMapByte(byte[] bytes, int width, int height)
+        {
+            byte[] byteArray = new byte[bytes.Length];
+            Buffer.BlockCopy(bytes, 0, byteArray, 0, bytes.Length);
+            
+            //Flip horizontally
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    byteArray[(y * width + x) * 2] = byteArray[(y * width + (width - 1 - x)) * 2];
+                }
+            }
+
+            float[] floatArray = new float[byteArray.Length];
+            Buffer.BlockCopy(byteArray, 0, floatArray, 0, byteArray.Length);
+            
+            var max = floatArray.Where(x => !float.IsNaN(x)).Max();
+            var min = floatArray.Where(x => !float.IsNaN(x) && x > -32000).Min();
+            var mid = (max + min) / 2;
+            print($"Max: {max}, Min: {min}, Mid: {mid}");
+            print($"Array length: {floatArray.Length}, image width: {width}, image height: {height}");
+
+            for (int i = 0; i < floatArray.Length; i++)
+            {
+                if (float.IsNaN(floatArray[i]))
+                {
+                    floatArray[i] = mid;
+                    print(floatArray[i]);
+                }
+                else floatArray[i] += -mid;
+            }
+
+            heightData = floatArray;
+            byte[] newpixels = new byte[bytes.Length * 4];
+            Buffer.BlockCopy(floatArray, 0, newpixels, 0, newpixels.Length);
+
+            _texture = new Texture2D(width, height, TextureFormat.RFloat, false);
+            _texture.LoadRawTextureData(newpixels);
             _texture.Apply();
             return _texture;
         }

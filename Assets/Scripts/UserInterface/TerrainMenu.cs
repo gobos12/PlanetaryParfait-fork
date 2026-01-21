@@ -347,7 +347,7 @@ namespace UserInterface
 
                 //original scaling is (200, 200, 200) - multiply current scale value by 200 to get approporiate values
                 SceneMaterializer.singleton.terrain.transform.localScale = new Vector3(
-                    SceneMaterializer.singleton.terrain.transform.localScale.x, t * 200,
+                    SceneMaterializer.singleton.terrain.transform.localScale.x, t * 100,
                     SceneMaterializer.singleton.terrain.transform.localScale.z);
 
                 //converts unity scaledheight back into height value to get accurate height in meters
